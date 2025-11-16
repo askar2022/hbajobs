@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { requireRole } from '@/lib/auth'
 import { NextResponse } from 'next/server'
-import { sendStatusUpdateEmail } from '@/lib/email'
+import { sendStatusUpdateEmail, sendJobOfferEmail, sendWelcomeEmail } from '@/lib/email'
 
 export async function POST(
   request: Request,
@@ -62,7 +62,7 @@ export async function POST(
         applicant_id,
         job_posting_id,
         applicants!inner (first_name, last_name, email),
-        job_postings!inner (title)
+        job_postings!inner (title, school_site)
       `)
       .eq('id', params.applicationId)
       .single()
@@ -73,13 +73,38 @@ export async function POST(
           
           if (applicant && jobPosting) {
             const applicantName = `${applicant.first_name} ${applicant.last_name}`
-            sendStatusUpdateEmail(
-              applicant.email,
-              applicantName,
-              jobPosting.title,
-              status,
-              comment
-            ).catch(err => console.error('Failed to send email:', err))
+            
+            // Send specialized email based on status
+            if (status === 'Offer') {
+              // Send job offer email
+              const startDate = comment || 'To be determined' // HR can include start date in comment
+              sendJobOfferEmail(
+                applicant.email,
+                applicantName,
+                jobPosting.title,
+                jobPosting.school_site,
+                startDate
+              ).catch(err => console.error('Failed to send offer email:', err))
+            } else if (status === 'Hired') {
+              // Send welcome email
+              const startDate = comment || 'To be determined'
+              sendWelcomeEmail(
+                applicant.email,
+                applicantName,
+                jobPosting.title,
+                jobPosting.school_site,
+                startDate
+              ).catch(err => console.error('Failed to send welcome email:', err))
+            } else {
+              // Send generic status update email
+              sendStatusUpdateEmail(
+                applicant.email,
+                applicantName,
+                jobPosting.title,
+                status,
+                comment
+              ).catch(err => console.error('Failed to send status update email:', err))
+            }
           }
         }
       })

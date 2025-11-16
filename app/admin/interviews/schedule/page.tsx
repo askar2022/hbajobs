@@ -82,6 +82,40 @@ function ScheduleInterviewForm() {
         comment: `Interview scheduled: ${formData.stage}`,
       })
 
+      // Send interview scheduled email (in background)
+      const { data: applicationData } = await supabase
+        .from('applications')
+        .select(`
+          applicants!inner (first_name, last_name, email),
+          job_postings!inner (title)
+        `)
+        .eq('id', formData.application_id)
+        .single()
+
+      if (applicationData?.applicants && applicationData?.job_postings) {
+        const applicant = Array.isArray(applicationData.applicants) ? applicationData.applicants[0] : applicationData.applicants
+        const jobPosting = Array.isArray(applicationData.job_postings) ? applicationData.job_postings[0] : applicationData.job_postings
+        
+        if (applicant && jobPosting) {
+          // Call API to send email
+          fetch('/api/emails/interview-scheduled', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              applicantEmail: applicant.email,
+              applicantName: `${applicant.first_name} ${applicant.last_name}`,
+              jobTitle: jobPosting.title,
+              interviewDetails: {
+                stage: formData.stage,
+                scheduled_at: formData.scheduled_at,
+                location: formData.location,
+                join_link: formData.join_link,
+              },
+            }),
+          }).catch(err => console.error('Failed to send interview email:', err))
+        }
+      }
+
       router.push(`/admin/applicants/${formData.application_id}`)
     } catch (err: any) {
       setError(err.message || 'An error occurred')

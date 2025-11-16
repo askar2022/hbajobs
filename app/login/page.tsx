@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import * as Tabs from '@radix-ui/react-tabs'
@@ -132,12 +133,48 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
+      {/* School Bus Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: 'url(/Beast_1-scaled.jpg)' }}
+      >
+        {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/40"></div>
+      </div>
+      
+      <div className="max-w-md w-full relative z-10">
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to HBA Jobs</h1>
-            <p className="text-gray-600">Sign in or create an account to continue</p>
+          {/* HBA Logo */}
+          <div className="flex justify-center mb-6">
+            <div className="flex items-center space-x-3">
+              <Image 
+                src="/hba.png" 
+                alt="HBA Logo" 
+                width={56} 
+                height={56}
+                className="object-contain"
+              />
+              <span className="text-2xl font-bold text-gray-900">HBA Jobs</span>
+            </div>
+          </div>
+
+          <div className="text-center mb-6">
+            {/* Helpful message for job applicants */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-800">
+                <span className="font-semibold">Applying for a job?</span>
+                <br />
+                Please sign up first, then you can complete your application form.
+              </p>
+            </div>
+
+            {/* HR Staff Login Info */}
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
+              <p className="text-xs text-green-800">
+                <span className="font-semibold">HR Staff?</span> Use your admin credentials to log in and access the admin dashboard.
+              </p>
+            </div>
           </div>
 
           {error && (

@@ -88,6 +88,131 @@ export const emailTemplates = {
     `,
   }),
 
+  jobOffer: (applicantName: string, jobTitle: string, schoolSite: string, startDate: string, salary?: string) => ({
+    subject: `🎉 Job Offer - ${jobTitle}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+            .button { display: inline-block; padding: 12px 24px; background: #10b981; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+            .details-box { background: white; padding: 20px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #10b981; }
+            .detail-row { margin: 10px 0; }
+            .detail-label { font-weight: bold; color: #4b5563; }
+            .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
+            .celebration { font-size: 48px; text-align: center; margin: 20px 0; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🎊 Congratulations!</h1>
+            </div>
+            <div class="content">
+              <div class="celebration">🎉</div>
+              <p>Dear ${applicantName},</p>
+              <p>We are thrilled to extend an offer for the <strong>${jobTitle}</strong> position at <strong>${schoolSite}</strong>!</p>
+              <p>After careful consideration of your application and interview, we are confident that you will be an excellent addition to our team.</p>
+              <div class="details-box">
+                <h3 style="margin-top: 0; color: #10b981;">Offer Details:</h3>
+                <div class="detail-row">
+                  <span class="detail-label">Position:</span> ${jobTitle}
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">School:</span> ${schoolSite}
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Proposed Start Date:</span> ${startDate}
+                </div>
+                ${salary ? `<div class="detail-row"><span class="detail-label">Salary:</span> ${salary}</div>` : ''}
+              </div>
+              <p><strong>Next Steps:</strong></p>
+              <ul>
+                <li>Review the complete offer details</li>
+                <li>Contact HR with any questions</li>
+                <li>Respond to accept or discuss the offer</li>
+              </ul>
+              <p>We hope you will join the HBA family and are looking forward to working with you!</p>
+              <a href="${process.env.NEXT_PUBLIC_APP_URL}/my-applications" class="button">View Application</a>
+              <p>Warm regards,<br>HBA Jobs Hiring Team</p>
+            </div>
+            <div class="footer">
+              <p>Harvest, Wakanda, and Sankofa Schools</p>
+              <p>© ${new Date().getFullYear()} HBA Jobs. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+  }),
+
+  welcomeHired: (applicantName: string, jobTitle: string, schoolSite: string, startDate: string) => ({
+    subject: `Welcome to HBA! - ${jobTitle}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+            .welcome-box { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 20px; border-radius: 6px; margin: 20px 0; text-align: center; }
+            .button { display: inline-block; padding: 12px 24px; background: #8b5cf6; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+            .checklist { background: white; padding: 20px; border-radius: 6px; margin: 20px 0; }
+            .checklist-item { margin: 10px 0; padding: 10px; border-left: 3px solid #8b5cf6; }
+            .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🌟 Welcome to the HBA Family!</h1>
+            </div>
+            <div class="content">
+              <div class="welcome-box">
+                <h2 style="margin: 0; color: #92400e;">Welcome Aboard, ${applicantName}!</h2>
+              </div>
+              <p>Dear ${applicantName},</p>
+              <p>Congratulations on officially joining <strong>${schoolSite}</strong> as our new <strong>${jobTitle}</strong>!</p>
+              <p>We're excited to have you on our team and look forward to the contributions you'll make to our students and community.</p>
+              
+              <div class="checklist">
+                <h3 style="margin-top: 0; color: #8b5cf6;">📋 Before Your Start Date (${startDate}):</h3>
+                <div class="checklist-item">✓ Complete onboarding paperwork</div>
+                <div class="checklist-item">✓ Submit required documents (ID, certifications, etc.)</div>
+                <div class="checklist-item">✓ Arrange for background check (if not completed)</div>
+                <div class="checklist-item">✓ Review employee handbook</div>
+              </div>
+
+              <p><strong>What to Expect on Your First Day:</strong></p>
+              <ul>
+                <li>Orientation with HR team</li>
+                <li>Meet your colleagues and supervisors</li>
+                <li>Workspace setup and IT access</li>
+                <li>Introduction to school policies and procedures</li>
+              </ul>
+
+              <p>If you have any questions before your start date, please don't hesitate to reach out to our HR team.</p>
+              
+              <p>We're thrilled to have you join us in making a difference in our students' lives!</p>
+              
+              <p>Best regards,<br><strong>The HBA Team</strong></p>
+            </div>
+            <div class="footer">
+              <p>Harvest, Wakanda, and Sankofa Schools</p>
+              <p>© ${new Date().getFullYear()} HBA Jobs. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+  }),
+
   interviewScheduled: (applicantName: string, jobTitle: string, interviewDetails: any) => ({
     subject: `Interview Scheduled - ${jobTitle}`,
     html: `
@@ -269,6 +394,31 @@ export async function sendInterviewScheduledEmail(
   interviewDetails: any
 ) {
   const template = emailTemplates.interviewScheduled(applicantName, jobTitle, interviewDetails)
+  await sendEmail(applicantEmail, template.subject, template.html)
+}
+
+// Send job offer email
+export async function sendJobOfferEmail(
+  applicantEmail: string,
+  applicantName: string,
+  jobTitle: string,
+  schoolSite: string,
+  startDate: string,
+  salary?: string
+) {
+  const template = emailTemplates.jobOffer(applicantName, jobTitle, schoolSite, startDate, salary)
+  await sendEmail(applicantEmail, template.subject, template.html)
+}
+
+// Send welcome/hired email
+export async function sendWelcomeEmail(
+  applicantEmail: string,
+  applicantName: string,
+  jobTitle: string,
+  schoolSite: string,
+  startDate: string
+) {
+  const template = emailTemplates.welcomeHired(applicantName, jobTitle, schoolSite, startDate)
   await sendEmail(applicantEmail, template.subject, template.html)
 }
 

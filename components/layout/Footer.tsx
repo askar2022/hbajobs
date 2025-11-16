@@ -41,9 +41,17 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-8 border-t border-gray-200 pt-8">
-          <p className="text-base text-gray-400 text-center">
-            &copy; {new Date().getFullYear()} HBA Jobs. All rights reserved.
-          </p>
+          <div className="text-center space-y-2">
+            <p className="text-base text-gray-400">
+              &copy; {new Date().getFullYear()} HBA Jobs. All rights reserved.
+            </p>
+            <p className="text-sm text-gray-500">
+              App designed and implemented by <span className="font-semibold text-gray-700">Dr. Askar</span>
+            </p>
+            <p className="text-xs text-gray-400">
+              All rights reserved © Dr. Askar {new Date().getFullYear()}
+            </p>
+          </div>
         </div>
       </div>
     </footer>

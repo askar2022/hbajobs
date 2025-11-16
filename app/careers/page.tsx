@@ -10,9 +10,6 @@ export default async function CareersPage() {
     .eq('posting_status', 'Published')
     .order('created_at', { ascending: false })
 
-  const schools = ['Harvest', 'Wakanda', 'Sankofa']
-  const departments = Array.from(new Set(jobs?.map(j => j.department).filter(Boolean) || []))
-
   return (
     <div className="bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -23,26 +20,6 @@ export default async function CareersPage() {
           <p className="mt-4 text-xl text-gray-600">
             Join our team and make a difference in education
           </p>
-        </div>
-
-        {/* Filters */}
-        <div className="mb-8 flex flex-wrap gap-4">
-          <select className="px-4 py-2 border border-gray-300 rounded-md">
-            <option value="">All Schools</option>
-            {schools.map((school) => (
-              <option key={school} value={school}>
-                {school}
-              </option>
-            ))}
-          </select>
-          <select className="px-4 py-2 border border-gray-300 rounded-md">
-            <option value="">All Departments</option>
-            {departments.map((dept) => (
-              <option key={dept} value={dept}>
-                {dept}
-              </option>
-            ))}
-          </select>
         </div>
 
         {/* Jobs List */}

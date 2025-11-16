@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
@@ -55,8 +56,16 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
-            <Link href="/" className="flex items-center">
-              <span className="text-xl font-bold text-primary-600">HBA Jobs</span>
+            <Link href="/" className="flex items-center space-x-3">
+              {/* HBA Logo */}
+              <Image 
+                src="/hba.png" 
+                alt="HBA Logo" 
+                width={40} 
+                height={40}
+                className="object-contain"
+              />
+              <span className="text-xl font-bold text-gray-900">HBA Jobs</span>
             </Link>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               <Link
