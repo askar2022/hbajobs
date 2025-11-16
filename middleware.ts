@@ -38,6 +38,11 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  // Don't check auth for password reset page - it has its own session handling
+  if (request.nextUrl.pathname === '/auth/update-password') {
+    return response
+  }
+
   // Refresh session - this is critical for server components
   const { data: { user } } = await supabase.auth.getUser()
 

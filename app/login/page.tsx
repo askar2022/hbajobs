@@ -281,6 +281,29 @@ export default function LoginPage() {
                     className="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                     placeholder="••••••••"
                   />
+                  <div className="mt-2 text-right">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        if (!email) {
+                          setError('Please enter your email address first')
+                          return
+                        }
+                        try {
+                          const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                            redirectTo: `${window.location.origin}/auth/update-password`,
+                          })
+                          if (error) throw error
+                          alert('Password reset email sent! Check your inbox.')
+                        } catch (err: any) {
+                          setError(err.message)
+                        }
+                      }}
+                      className="text-sm text-primary-600 hover:text-primary-500"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
                 </div>
                 <button
                   type="submit"
