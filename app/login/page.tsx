@@ -20,10 +20,24 @@ export default function LoginPage() {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        // User is already logged in, redirect based on returnUrl or default to My Applications
+        // Get user role from database
+        const { data: userData } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', user.id)
+          .single()
+
+        // Determine redirect URL based on returnUrl or user role
         const params = new URLSearchParams(window.location.search)
-        const returnUrl = params.get('returnUrl') || '/my-applications'
-        router.push(returnUrl)
+        const returnUrl = params.get('returnUrl')
+        
+        if (returnUrl) {
+          router.push(returnUrl)
+        } else {
+          // Redirect based on role
+          const isAdmin = ['HR', 'Admin', 'Principal', 'HiringManager'].includes(userData?.role)
+          router.push(isAdmin ? '/admin/jobs' : '/my-applications')
+        }
       }
     }
     checkUser()
@@ -35,17 +49,31 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
       if (signInError) throw signInError
 
-      // Redirect based on returnUrl or default to My Applications
+      // Get user role from database
+      const { data: userData } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', authData.user?.id)
+        .single()
+
+      // Determine redirect URL based on returnUrl or user role
       const params = new URLSearchParams(window.location.search)
-      const returnUrl = params.get('returnUrl') || '/my-applications'
-      router.push(returnUrl)
+      const returnUrl = params.get('returnUrl')
+      
+      if (returnUrl) {
+        router.push(returnUrl)
+      } else {
+        // Redirect based on role
+        const isAdmin = ['HR', 'Admin', 'Principal', 'HiringManager'].includes(userData?.role)
+        router.push(isAdmin ? '/admin/jobs' : '/my-applications')
+      }
       router.refresh()
     } catch (err: any) {
       setError(err.message || 'An error occurred')
