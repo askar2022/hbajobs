@@ -4,6 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'notifications@hbajobs.org'
 const HR_EMAIL = process.env.HR_NOTIFICATION_EMAIL || 'hr@hbajobs.org'
+const EXECUTIVE_DIRECTOR_EMAIL = process.env.Executive_Director_NOTIFICATION_EMAIL || ''
 
 // Email Templates
 export const emailTemplates = {
@@ -449,10 +450,25 @@ export async function sendApplicationSubmittedEmails(
     } else {
       console.error(`❌ Failed to send HR email to ${HR_EMAIL}:`, hrResult.error)
     }
+
+    // Send notification to Executive Director if configured
+    let executiveResult: { success: boolean; error?: any; data?: any } = { success: false, error: 'Not configured' }
+    if (EXECUTIVE_DIRECTOR_EMAIL) {
+      console.log(`📧 Sending Executive Director notification email to: ${EXECUTIVE_DIRECTOR_EMAIL}`)
+      const executiveTemplate = emailTemplates.hrNotification(applicantName, applicantEmail, jobTitle, schoolSite, applicationId)
+      executiveResult = await sendEmail(EXECUTIVE_DIRECTOR_EMAIL, executiveTemplate.subject, executiveTemplate.html)
+      
+      if (executiveResult.success) {
+        console.log(`✅ Executive Director email sent successfully to ${EXECUTIVE_DIRECTOR_EMAIL}`)
+      } else {
+        console.error(`❌ Failed to send Executive Director email to ${EXECUTIVE_DIRECTOR_EMAIL}:`, executiveResult.error)
+      }
+    }
     
     return {
       applicant: applicantResult,
-      hr: hrResult
+      hr: hrResult,
+      executive: executiveResult
     }
   } catch (error) {
     console.error('❌ Exception in sendApplicationSubmittedEmails:', error)
@@ -472,7 +488,7 @@ export async function sendStatusUpdateEmail(
   await sendEmail(applicantEmail, template.subject, template.html)
 }
 
-// Send status update notification to HR
+// Send status update notification to HR and Executive Director
 export async function sendHRStatusUpdateEmail(
   applicantName: string,
   applicantEmail: string,
@@ -482,17 +498,34 @@ export async function sendHRStatusUpdateEmail(
   comment: string | undefined,
   applicationId: string
 ) {
+  // Send to HR
   console.log(`📧 Sending HR status update notification to: ${HR_EMAIL}`)
   const template = emailTemplates.hrStatusUpdate(applicantName, applicantEmail, jobTitle, schoolSite, newStatus, comment, applicationId)
-  const result = await sendEmail(HR_EMAIL, template.subject, template.html)
+  const hrResult = await sendEmail(HR_EMAIL, template.subject, template.html)
   
-  if (result.success) {
+  if (hrResult.success) {
     console.log(`✅ HR status update email sent successfully to ${HR_EMAIL}`)
   } else {
-    console.error(`❌ Failed to send HR status update email to ${HR_EMAIL}:`, result.error)
+    console.error(`❌ Failed to send HR status update email to ${HR_EMAIL}:`, hrResult.error)
+  }
+
+  // Send to Executive Director if configured
+  let executiveResult: { success: boolean; error?: any; data?: any } = { success: false, error: 'Not configured' }
+  if (EXECUTIVE_DIRECTOR_EMAIL) {
+    console.log(`📧 Sending Executive Director status update notification to: ${EXECUTIVE_DIRECTOR_EMAIL}`)
+    executiveResult = await sendEmail(EXECUTIVE_DIRECTOR_EMAIL, template.subject, template.html)
+    
+    if (executiveResult.success) {
+      console.log(`✅ Executive Director status update email sent successfully to ${EXECUTIVE_DIRECTOR_EMAIL}`)
+    } else {
+      console.error(`❌ Failed to send Executive Director status update email to ${EXECUTIVE_DIRECTOR_EMAIL}:`, executiveResult.error)
+    }
   }
   
-  return result
+  return {
+    hr: hrResult,
+    executive: executiveResult
+  }
 }
 
 // Send interview scheduled email
