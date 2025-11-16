@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { requireRole } from '@/lib/auth'
 import { NextResponse } from 'next/server'
-import { sendStatusUpdateEmail, sendJobOfferEmail, sendWelcomeEmail } from '@/lib/email'
+import { sendStatusUpdateEmail, sendJobOfferEmail, sendWelcomeEmail, sendHRStatusUpdateEmail } from '@/lib/email'
 
 export async function POST(
   request: Request,
@@ -55,7 +55,7 @@ export async function POST(
       comment: comment || null,
     })
 
-    // Send email notification to applicant (in background, don't wait)
+    // Send email notifications (in background, don't wait)
     supabase
       .from('applications')
       .select(`
@@ -74,7 +74,7 @@ export async function POST(
           if (applicant && jobPosting) {
             const applicantName = `${applicant.first_name} ${applicant.last_name}`
             
-            // Send specialized email based on status
+            // Send email to applicant based on status
             if (status === 'Offer') {
               // Send job offer email
               const startDate = comment || 'To be determined' // HR can include start date in comment
@@ -105,6 +105,17 @@ export async function POST(
                 comment
               ).catch(err => console.error('Failed to send status update email:', err))
             }
+
+            // Send notification to HR about the status change
+            sendHRStatusUpdateEmail(
+              applicantName,
+              applicant.email,
+              jobPosting.title,
+              jobPosting.school_site,
+              status,
+              comment,
+              params.applicationId
+            ).catch(err => console.error('Failed to send HR status update email:', err))
           }
         }
       })

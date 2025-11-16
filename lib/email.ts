@@ -325,6 +325,68 @@ export const emailTemplates = {
       </html>
     `,
   }),
+
+  hrStatusUpdate: (applicantName: string, applicantEmail: string, jobTitle: string, schoolSite: string, newStatus: string, comment: string | undefined, applicationId: string) => ({
+    subject: `Application Status Changed - ${applicantName} - ${jobTitle}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+            .button { display: inline-block; padding: 12px 24px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+            .details-box { background: white; padding: 20px; border-radius: 6px; margin: 20px 0; }
+            .detail-row { margin: 10px 0; }
+            .detail-label { font-weight: bold; color: #4b5563; }
+            .status-badge { display: inline-block; padding: 8px 16px; background: #dbeafe; color: #1e40af; border-radius: 20px; font-weight: bold; margin: 10px 0; }
+            .comment-box { background: #fef3c7; padding: 15px; border-left: 4px solid #f59e0b; margin: 15px 0; }
+            .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>📊 Status Update</h1>
+            </div>
+            <div class="content">
+              <p>Hello HR Team,</p>
+              <p>An application status has been updated:</p>
+              <div class="details-box">
+                <div class="detail-row">
+                  <span class="detail-label">Applicant:</span> ${applicantName}
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Email:</span> ${applicantEmail}
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Position:</span> ${jobTitle}
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">School:</span> ${schoolSite}
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">New Status:</span> <span class="status-badge">${newStatus}</span>
+                </div>
+                ${comment ? `<div class="comment-box"><strong>Note:</strong><br>${comment}</div>` : ''}
+                <div class="detail-row">
+                  <span class="detail-label">Updated:</span> ${new Date().toLocaleString()}
+                </div>
+              </div>
+              <p>View the full application details:</p>
+              <a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/applicants/${applicationId}" class="button">View Application</a>
+              <p>Best regards,<br>HBA Jobs System</p>
+            </div>
+            <div class="footer">
+              <p>This is an automated notification from HBA Jobs</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+  }),
 }
 
 // Send email function
@@ -365,13 +427,37 @@ export async function sendApplicationSubmittedEmails(
   schoolSite: string,
   applicationId: string
 ) {
-  // Send confirmation to applicant
-  const applicantTemplate = emailTemplates.applicationSubmitted(applicantName, jobTitle, schoolSite)
-  await sendEmail(applicantEmail, applicantTemplate.subject, applicantTemplate.html)
+  try {
+    // Send confirmation to applicant
+    console.log(`📧 Sending applicant confirmation email to: ${applicantEmail}`)
+    const applicantTemplate = emailTemplates.applicationSubmitted(applicantName, jobTitle, schoolSite)
+    const applicantResult = await sendEmail(applicantEmail, applicantTemplate.subject, applicantTemplate.html)
+    
+    if (applicantResult.success) {
+      console.log(`✅ Applicant email sent successfully to ${applicantEmail}`)
+    } else {
+      console.error(`❌ Failed to send applicant email to ${applicantEmail}:`, applicantResult.error)
+    }
 
-  // Send notification to HR
-  const hrTemplate = emailTemplates.hrNotification(applicantName, applicantEmail, jobTitle, schoolSite, applicationId)
-  await sendEmail(HR_EMAIL, hrTemplate.subject, hrTemplate.html)
+    // Send notification to HR
+    console.log(`📧 Sending HR notification email to: ${HR_EMAIL}`)
+    const hrTemplate = emailTemplates.hrNotification(applicantName, applicantEmail, jobTitle, schoolSite, applicationId)
+    const hrResult = await sendEmail(HR_EMAIL, hrTemplate.subject, hrTemplate.html)
+    
+    if (hrResult.success) {
+      console.log(`✅ HR email sent successfully to ${HR_EMAIL}`)
+    } else {
+      console.error(`❌ Failed to send HR email to ${HR_EMAIL}:`, hrResult.error)
+    }
+    
+    return {
+      applicant: applicantResult,
+      hr: hrResult
+    }
+  } catch (error) {
+    console.error('❌ Exception in sendApplicationSubmittedEmails:', error)
+    throw error
+  }
 }
 
 // Send status update email
@@ -384,6 +470,29 @@ export async function sendStatusUpdateEmail(
 ) {
   const template = emailTemplates.statusUpdate(applicantName, jobTitle, newStatus, comment)
   await sendEmail(applicantEmail, template.subject, template.html)
+}
+
+// Send status update notification to HR
+export async function sendHRStatusUpdateEmail(
+  applicantName: string,
+  applicantEmail: string,
+  jobTitle: string,
+  schoolSite: string,
+  newStatus: string,
+  comment: string | undefined,
+  applicationId: string
+) {
+  console.log(`📧 Sending HR status update notification to: ${HR_EMAIL}`)
+  const template = emailTemplates.hrStatusUpdate(applicantName, applicantEmail, jobTitle, schoolSite, newStatus, comment, applicationId)
+  const result = await sendEmail(HR_EMAIL, template.subject, template.html)
+  
+  if (result.success) {
+    console.log(`✅ HR status update email sent successfully to ${HR_EMAIL}`)
+  } else {
+    console.error(`❌ Failed to send HR status update email to ${HR_EMAIL}:`, result.error)
+  }
+  
+  return result
 }
 
 // Send interview scheduled email
