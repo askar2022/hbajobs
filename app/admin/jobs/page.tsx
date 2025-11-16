@@ -25,8 +25,35 @@ export default async function AdminJobsPage() {
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Quick Navigation */}
+        {['HR', 'Admin'].includes(user.role) && (
+          <div className="mb-6 flex gap-2">
+            <Link
+              href="/admin"
+              className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              🏠 Dashboard
+            </Link>
+            <Link
+              href="/admin/jobs"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium"
+            >
+              📋 Job Postings
+            </Link>
+            <Link
+              href="/admin/users"
+              className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              👥 User Management
+            </Link>
+          </div>
+        )}
+
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Job Postings</h1>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Job Postings</h1>
+            <p className="text-gray-600 mt-1">Create and manage job listings</p>
+          </div>
           {['HR', 'Admin'].includes(user.role) && (
             <Link
               href="/admin/jobs/new"

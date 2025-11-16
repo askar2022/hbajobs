@@ -93,7 +93,7 @@ export default function LoginPage() {
       } else {
         // Redirect based on role
         const isAdmin = ['HR', 'Admin', 'Principal', 'HiringManager'].includes(userData?.role)
-        router.push(isAdmin ? '/admin/jobs' : '/my-applications')
+        router.push(isAdmin ? '/admin' : '/my-applications')
       }
       router.refresh()
     } catch (err: any) {

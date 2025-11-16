@@ -11,17 +11,10 @@ export const metadata: Metadata = {
   title: 'HBA Jobs - Employment Application System',
   description: 'Apply for positions at Harvest, Wakanda, and Sankofa schools',
   manifest: '/manifest.json',
-  themeColor: '#2563eb',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'HBA Jobs',
-  },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
   },
   icons: {
     icon: '/hba.png',
@@ -36,6 +29,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <meta name="theme-color" content="#2563eb" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+      </head>
       <body className={inter.className}>
         <Navbar />
         <main className="min-h-screen">{children}</main>
